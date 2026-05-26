@@ -1,0 +1,59 @@
+﻿CREATE DATABASE IF NOT EXISTS wepay_db CHARACTER
+SET
+  utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+USE wepay_db;
+
+CREATE TABLE
+  IF NOT EXISTS usuarios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(150) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    senha VARCHAR(255) NOT NULL,
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+
+CREATE TABLE
+  IF NOT EXISTS grupos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(150) NOT NULL,
+    descricao TEXT NULL,
+    criado_por INT NOT NULL,
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (criado_por) REFERENCES usuarios (id) ON DELETE CASCADE
+  ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+
+CREATE TABLE
+  IF NOT EXISTS participantes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    grupo_id INT NOT NULL,
+    usuario_id INT NOT NULL,
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uniq_participante (grupo_id, usuario_id),
+    FOREIGN KEY (grupo_id) REFERENCES grupos (id) ON DELETE CASCADE,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios (id) ON DELETE CASCADE
+  ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+
+CREATE TABLE
+  IF NOT EXISTS despesas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    grupo_id INT NOT NULL,
+    pagador_id INT NOT NULL,
+    descricao TEXT NOT NULL,
+    valor DECIMAL(10, 2) NOT NULL,
+    data_despesa TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (grupo_id) REFERENCES grupos (id) ON DELETE CASCADE,
+    FOREIGN KEY (pagador_id) REFERENCES usuarios (id) ON DELETE RESTRICT
+  ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
+
+CREATE TABLE
+  IF NOT EXISTS saldos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    grupo_id INT NOT NULL,
+    usuario_id INT NOT NULL,
+    saldo DECIMAL(12, 2) NOT NULL DEFAULT 0.00,
+    atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uniq_saldo (grupo_id, usuario_id),
+    FOREIGN KEY (grupo_id) REFERENCES grupos (id) ON DELETE CASCADE,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios (id) ON DELETE CASCADE
+  ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
