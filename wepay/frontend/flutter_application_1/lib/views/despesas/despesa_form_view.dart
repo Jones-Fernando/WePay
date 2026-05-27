@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_application_1/services/api_services.dart';
 
 class DespesaFormView extends StatefulWidget {
-  const DespesaFormView({Key? key}) : super(key: key);
+  const DespesaFormView({super.key});
 
   @override
   State<DespesaFormView> createState() => _DespesaFormViewState();

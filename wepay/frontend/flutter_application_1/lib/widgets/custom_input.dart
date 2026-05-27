@@ -8,13 +8,13 @@ class CustomInput extends StatelessWidget {
   final TextEditingController controller;
 
   const CustomInput({
-    Key? key,
+    super.key,
     required this.label,
     required this.icon,
     required this.controller,
     this.isPassword = false,
     this.keyboardType = TextInputType.text,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

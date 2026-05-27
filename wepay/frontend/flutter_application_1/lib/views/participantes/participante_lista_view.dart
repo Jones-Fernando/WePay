@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/services/api_services.dart';
 
 class ParticipanteListaView extends StatefulWidget {
-  const ParticipanteListaView({Key? key}) : super(key: key);
+  const ParticipanteListaView({super.key});
 
   @override
   State<ParticipanteListaView> createState() => _ParticipanteListaViewState();
@@ -142,8 +142,8 @@ class _ParticipanteListaViewState extends State<ParticipanteListaView> {
                 ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.teal,
-        child: const Icon(Icons.person_add, color: Colors.white),
         onPressed: _adicionarParticipante,
+        child: const Icon(Icons.person_add, color: Colors.white),
       ),
     );
   }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/services/api_services.dart';
 
 class GrupoFormView extends StatefulWidget {
-  const GrupoFormView({Key? key}) : super(key: key);
+  const GrupoFormView({super.key});
 
   @override
   State<GrupoFormView> createState() => _GrupoFormViewState();

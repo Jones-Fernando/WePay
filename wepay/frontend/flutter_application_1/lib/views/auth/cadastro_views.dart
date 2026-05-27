@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/services/api_services.dart';
 
 class CadastroView extends StatefulWidget {
-  const CadastroView({Key? key}) : super(key: key);
+  const CadastroView({super.key});
 
   @override
   State<CadastroView> createState() => _CadastroViewState();

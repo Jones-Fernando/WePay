@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/services/api_services.dart';
 
 class SaldoListaView extends StatefulWidget {
-  const SaldoListaView({Key? key}) : super(key: key);
+  const SaldoListaView({super.key});
 
   @override
   State<SaldoListaView> createState() => _SaldoListaViewState();

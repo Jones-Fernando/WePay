@@ -15,7 +15,7 @@ void main() {
 }
 
 class WePayApp extends StatelessWidget {
-  const WePayApp({Key? key}) : super(key: key);
+  const WePayApp({super.key});
 
   @override
   Widget build(BuildContext context) {

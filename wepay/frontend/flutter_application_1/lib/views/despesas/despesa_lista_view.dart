@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/services/api_services.dart';
 
 class DespesaListaView extends StatefulWidget {
-  const DespesaListaView({Key? key}) : super(key: key);
+  const DespesaListaView({super.key});
 
   @override
   State<DespesaListaView> createState() => _DespesaListaViewState();

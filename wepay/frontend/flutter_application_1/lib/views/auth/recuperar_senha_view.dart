@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/services/api_services.dart';
 
 class RecuperarSenhaView extends StatefulWidget {
-  const RecuperarSenhaView({Key? key}) : super(key: key);
+  const RecuperarSenhaView({super.key});
 
   @override
   State<RecuperarSenhaView> createState() => _RecuperarSenhaViewState();
