@@ -51,8 +51,13 @@ class _CadastroViewState extends State<CadastroView> {
         backgroundColor: Colors.teal,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.fromLTRB(
+          24,
+          24,
+          24,
+          MediaQuery.of(context).viewInsets.bottom + 24,
+        ),
         child: Form(
           key: _formKey,
           child: Column(
@@ -60,15 +65,26 @@ class _CadastroViewState extends State<CadastroView> {
               TextFormField(
                 controller: _nomeCtrl,
                 textCapitalization: TextCapitalization.words,
-                decoration: const InputDecoration(labelText: 'Nome completo', border: OutlineInputBorder(), prefixIcon: Icon(Icons.person)),
-                validator: (v) => (v == null || v.trim().length < 3) ? 'Nome deve ter ao menos 3 caracteres' : null,
+                decoration: const InputDecoration(
+                  labelText: 'Nome completo',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.person),
+                ),
+                validator: (v) => (v == null || v.trim().length < 3)
+                    ? 'Nome deve ter ao menos 3 caracteres'
+                    : null,
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _emailCtrl,
                 keyboardType: TextInputType.emailAddress,
-                decoration: const InputDecoration(labelText: 'E-mail', border: OutlineInputBorder(), prefixIcon: Icon(Icons.email)),
-                validator: (v) => (v == null || !v.contains('@')) ? 'E-mail inválido' : null,
+                decoration: const InputDecoration(
+                  labelText: 'E-mail',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.email),
+                ),
+                validator: (v) =>
+                    (v == null || !v.contains('@')) ? 'E-mail inválido' : null,
               ),
               const SizedBox(height: 16),
               TextFormField(
@@ -79,11 +95,16 @@ class _CadastroViewState extends State<CadastroView> {
                   border: const OutlineInputBorder(),
                   prefixIcon: const Icon(Icons.lock),
                   suffixIcon: IconButton(
-                    icon: Icon(_senhaVisivel ? Icons.visibility_off : Icons.visibility),
-                    onPressed: () => setState(() => _senhaVisivel = !_senhaVisivel),
+                    icon: Icon(
+                      _senhaVisivel ? Icons.visibility_off : Icons.visibility,
+                    ),
+                    onPressed: () =>
+                        setState(() => _senhaVisivel = !_senhaVisivel),
                   ),
                 ),
-                validator: (v) => (v == null || v.length < 6) ? 'Senha deve ter ao menos 6 caracteres' : null,
+                validator: (v) => (v == null || v.length < 6)
+                    ? 'Senha deve ter ao menos 6 caracteres'
+                    : null,
               ),
               const SizedBox(height: 24),
               SizedBox(
@@ -93,8 +114,14 @@ class _CadastroViewState extends State<CadastroView> {
                   style: ElevatedButton.styleFrom(backgroundColor: Colors.teal),
                   onPressed: _carregando ? null : _salvarCadastro,
                   child: _carregando
-                      ? const CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
-                      : const Text('Criar Conta', style: TextStyle(color: Colors.white, fontSize: 16)),
+                      ? const CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        )
+                      : const Text(
+                          'Criar Conta',
+                          style: TextStyle(color: Colors.white, fontSize: 16),
+                        ),
                 ),
               ),
             ],

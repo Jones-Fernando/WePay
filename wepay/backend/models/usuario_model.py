@@ -66,3 +66,35 @@ class UsuarioModel:
                 conn.commit()
             finally:
                 cursor.close()
+
+    @staticmethod
+    def atualizar(usuario_id, nome, email, senha_hash=None):
+        with get_connection_context() as conn:
+            cursor = conn.cursor()
+            try:
+                if senha_hash:
+                    cursor.execute(
+                        "UPDATE usuarios SET nome = %s, email = %s, senha = %s WHERE id = %s",
+                        (nome, email, senha_hash, usuario_id)
+                    )
+                else:
+                    cursor.execute(
+                        "UPDATE usuarios SET nome = %s, email = %s WHERE id = %s",
+                        (nome, email, usuario_id)
+                    )
+                conn.commit()
+            finally:
+                cursor.close()
+
+    @staticmethod
+    def deletar(usuario_id):
+        with get_connection_context() as conn:
+            cursor = conn.cursor()
+            try:
+                cursor.execute(
+                    "DELETE FROM usuarios WHERE id = %s",
+                    (usuario_id,)
+                )
+                conn.commit()
+            finally:
+                cursor.close()

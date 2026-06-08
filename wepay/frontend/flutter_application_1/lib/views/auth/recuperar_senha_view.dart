@@ -41,12 +41,20 @@ class _RecuperarSenhaViewState extends State<RecuperarSenhaView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Recuperar Senha', style: TextStyle(color: Colors.white)),
+        title: const Text(
+          'Recuperar Senha',
+          style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: Colors.teal,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.fromLTRB(
+          24,
+          24,
+          24,
+          MediaQuery.of(context).viewInsets.bottom + 24,
+        ),
         child: Form(
           key: _formKey,
           child: Column(
@@ -66,7 +74,8 @@ class _RecuperarSenhaViewState extends State<RecuperarSenhaView> {
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.email),
                 ),
-                validator: (v) => (v == null || !v.contains('@')) ? 'E-mail inválido' : null,
+                validator: (v) =>
+                    (v == null || !v.contains('@')) ? 'E-mail inválido' : null,
               ),
               const SizedBox(height: 24),
               if (_enviado)
@@ -78,7 +87,12 @@ class _RecuperarSenhaViewState extends State<RecuperarSenhaView> {
                       children: [
                         Icon(Icons.check_circle, color: Colors.white),
                         SizedBox(width: 12),
-                        Expanded(child: Text('Nova senha enviada! Verifique seu e-mail.', style: TextStyle(color: Colors.white))),
+                        Expanded(
+                          child: Text(
+                            'Nova senha enviada! Verifique seu e-mail.',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -88,11 +102,19 @@ class _RecuperarSenhaViewState extends State<RecuperarSenhaView> {
                   width: double.infinity,
                   height: 50,
                   child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.teal),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.teal,
+                    ),
                     onPressed: _carregando ? null : _enviar,
                     child: _carregando
-                        ? const CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
-                        : const Text('Enviar Nova Senha', style: TextStyle(color: Colors.white, fontSize: 16)),
+                        ? const CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          )
+                        : const Text(
+                            'Enviar Nova Senha',
+                            style: TextStyle(color: Colors.white, fontSize: 16),
+                          ),
                   ),
                 ),
               if (_enviado) ...[
@@ -102,7 +124,10 @@ class _RecuperarSenhaViewState extends State<RecuperarSenhaView> {
                   height: 50,
                   child: OutlinedButton(
                     onPressed: () => Navigator.pop(context),
-                    child: const Text('Voltar ao Login', style: TextStyle(color: Colors.teal)),
+                    child: const Text(
+                      'Voltar ao Login',
+                      style: TextStyle(color: Colors.teal),
+                    ),
                   ),
                 ),
               ],

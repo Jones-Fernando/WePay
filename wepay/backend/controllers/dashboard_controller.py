@@ -19,10 +19,20 @@ class DashboardController:
             )
             pagar = float(cursor.fetchone()['total'])
 
-            cursor.execute("SELECT COUNT(*) as qtd FROM grupos")
+            cursor.execute(
+                "SELECT COUNT(DISTINCT g.id) as qtd FROM grupos g "
+                "JOIN participantes p ON p.grupo_id = g.id "
+                "WHERE p.usuario_id = %s",
+                (current_user_id,)
+            )
             total_grupos = cursor.fetchone()['qtd']
 
-            cursor.execute("SELECT COALESCE(SUM(valor), 0) as total FROM despesas")
+            cursor.execute(
+                "SELECT COALESCE(SUM(d.valor), 0) as total FROM despesas d "
+                "JOIN participantes p ON p.grupo_id = d.grupo_id "
+                "WHERE p.usuario_id = %s",
+                (current_user_id,)
+            )
             total_gasto = float(cursor.fetchone()['total'])
 
             cursor.close()

@@ -15,6 +15,8 @@ class _DespesaFormViewState extends State<DespesaFormView> {
   int? _idEdicao;
   late Map grupo;
   bool _inicializado = false;
+  List<dynamic> _participantes = [];
+  int? _pagadorId;
 
   @override
   void didChangeDependencies() {
@@ -28,7 +30,13 @@ class _DespesaFormViewState extends State<DespesaFormView> {
       _idEdicao = despesa['id'];
       _descricaoCtrl.text = despesa['descricao'] ?? '';
       _valorCtrl.text = despesa['valor']?.toString() ?? '';
+      // se estiver editando, preenche pagador se disponível
+      if (despesa['pagador_id'] != null) {
+        _pagadorId = despesa['pagador_id'] as int?;
+      }
     }
+    // carregar participantes do grupo para selecionar pagador
+    _carregarParticipantes();
   }
 
   @override
@@ -36,6 +44,18 @@ class _DespesaFormViewState extends State<DespesaFormView> {
     _descricaoCtrl.dispose();
     _valorCtrl.dispose();
     super.dispose();
+  }
+
+  void _carregarParticipantes() async {
+    final participantes = await ApiService.getParticipantes(grupo['id']);
+    if (!mounted) return;
+    setState(() {
+      _participantes = participantes;
+      // se não houver pagador selecionado, escolher o primeiro (ou manter nulo)
+      if (_pagadorId == null && participantes.isNotEmpty) {
+        _pagadorId = participantes.first['usuario_id'] as int?;
+      }
+    });
   }
 
   void _salvar() async {
@@ -60,6 +80,7 @@ class _DespesaFormViewState extends State<DespesaFormView> {
       'grupo_id': grupo['id'],
       'descricao': descricao,
       'valor': valor,
+      if (_pagadorId != null) 'pagador_id': _pagadorId,
     };
     final sucesso = await ApiService.salvarDespesa(dados, id: _idEdicao);
     if (!mounted) return;
@@ -69,8 +90,8 @@ class _DespesaFormViewState extends State<DespesaFormView> {
         SnackBar(
           content: Text(
             _idEdicao == null
-                ? 'Despesa criada com sucesso!'
-                : 'Despesa atualizada com sucesso!',
+                ? 'Despesa criada e dividida automaticamente entre o grupo!'
+                : 'Despesa atualizada e divisão recalculada automaticamente!',
           ),
         ),
       );
@@ -91,8 +112,13 @@ class _DespesaFormViewState extends State<DespesaFormView> {
         ),
         backgroundColor: Colors.teal,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.fromLTRB(
+          24,
+          24,
+          24,
+          MediaQuery.of(context).viewInsets.bottom + 24,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -107,7 +133,33 @@ class _DespesaFormViewState extends State<DespesaFormView> {
                 style: const TextStyle(color: Colors.grey, fontSize: 14),
               ),
             ],
-            const SizedBox(height: 20),
+            const SizedBox(height: 8),
+            const Text(
+              'Esta despesa será dividida automaticamente entre todos os participantes do grupo.',
+              style: TextStyle(
+                color: Colors.teal,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 12),
+            if (_participantes.isNotEmpty) ...[
+              DropdownButtonFormField<int>(
+                initialValue: _pagadorId,
+                decoration: const InputDecoration(
+                  labelText: 'Pagador',
+                  border: OutlineInputBorder(),
+                ),
+                items: _participantes.map<DropdownMenuItem<int>>((p) {
+                  final uid = p['usuario_id'] as int?;
+                  final nome = p['nome'] ?? p['email'] ?? 'Usuário';
+                  return DropdownMenuItem<int>(value: uid, child: Text(nome));
+                }).toList(),
+                onChanged: (v) => setState(() => _pagadorId = v),
+              ),
+              const SizedBox(height: 16),
+            ],
+            const SizedBox(height: 8),
             TextField(
               controller: _descricaoCtrl,
               decoration: const InputDecoration(

@@ -1,6 +1,7 @@
 from flask import request
 from models.despesa_model import DespesaModel
 from models.grupo_model import GrupoModel
+from models.participante_model import ParticipanteModel
 from services.divisao_service import DivisaoService
 from utils.response_utils import ResponseUtils
 
@@ -33,6 +34,12 @@ class DespesaController:
         if not grupo:
             return ResponseUtils.erro("Grupo nao encontrado.", status=404)
 
+        if not ParticipanteModel.buscar(grupo_id, current_user_id):
+            return ResponseUtils.erro("Voce nao participa deste grupo.", status=403)
+
+        if not ParticipanteModel.buscar(grupo_id, int(pagador_id)):
+            return ResponseUtils.erro("Pagador deve ser participante do grupo.", status=400)
+
         despesa_id = DespesaModel.criar(grupo_id, int(pagador_id), descricao, v_float)
         DivisaoService.recalcular_saldos_grupo(grupo_id, v_float, int(pagador_id))
         return ResponseUtils.sucesso(dados={'id': despesa_id}, mensagem="Despesa registrada e dividida.", status=201)
@@ -42,6 +49,8 @@ class DespesaController:
         grupo = GrupoModel.buscar_por_id(grupo_id)
         if not grupo:
             return ResponseUtils.erro("Grupo nao encontrado.", status=404)
+        if not ParticipanteModel.buscar(grupo_id, current_user_id):
+            return ResponseUtils.erro("Voce nao participa deste grupo.", status=403)
         lista = DespesaModel.listar_por_grupo(grupo_id)
         return ResponseUtils.sucesso(dados=lista)
 
@@ -50,6 +59,7 @@ class DespesaController:
         data = request.get_json() or {}
         descricao = data.get('descricao', '').strip()
         valor = data.get('valor')
+        pagador_id = data.get('pagador_id')
 
         if not descricao:
             return ResponseUtils.erro("Descricao eh obrigatoria.")
@@ -68,14 +78,23 @@ class DespesaController:
         if not despesa_atual:
             return ResponseUtils.erro("Despesa nao encontrada.", status=404)
 
+        grupo_id = despesa_atual['grupo_id']
+        if not ParticipanteModel.buscar(grupo_id, current_user_id):
+            return ResponseUtils.erro("Voce nao participa deste grupo.", status=403)
+
+        if pagador_id is None:
+            pagador_id = despesa_atual['pagador_id']
+
+        if not ParticipanteModel.buscar(grupo_id, int(pagador_id)):
+            return ResponseUtils.erro("Pagador deve ser participante do grupo.", status=400)
+
         # Reverter saldo do valor antigo antes de aplicar o novo
         valor_antigo = float(despesa_atual['valor'])
-        grupo_id = despesa_atual['grupo_id']
-        pagador_id = despesa_atual['pagador_id']
+        antigo_pagador_id = despesa_atual['pagador_id']
 
-        DivisaoService.reverter_saldos_grupo(grupo_id, valor_antigo, pagador_id)
-        DespesaModel.atualizar(despesa_id, descricao, v_float)
-        DivisaoService.recalcular_saldos_grupo(grupo_id, v_float, pagador_id)
+        DivisaoService.reverter_saldos_grupo(grupo_id, valor_antigo, antigo_pagador_id)
+        DespesaModel.atualizar(despesa_id, descricao, v_float, int(pagador_id))
+        DivisaoService.recalcular_saldos_grupo(grupo_id, v_float, int(pagador_id))
 
         return ResponseUtils.sucesso(mensagem="Despesa atualizada.")
 
@@ -84,6 +103,9 @@ class DespesaController:
         despesa = DespesaModel.buscar_por_id(despesa_id)
         if not despesa:
             return ResponseUtils.erro("Despesa nao encontrada.", status=404)
+
+        if not ParticipanteModel.buscar(despesa['grupo_id'], current_user_id):
+            return ResponseUtils.erro("Voce nao participa deste grupo.", status=403)
 
         # Reverter saldos antes de deletar
         DivisaoService.reverter_saldos_grupo(

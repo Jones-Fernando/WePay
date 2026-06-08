@@ -1,8 +1,23 @@
-from flask import Blueprint
+﻿from flask import Blueprint
 from controllers.saldo_controller import SaldoController
 from middlewares.auth_middleware import token_required
 
 saldo_bp = Blueprint('saldo_bp', __name__)
+
+@saldo_bp.route('', methods=['POST'])
+@token_required
+def criar(current_user_id):
+    return SaldoController.criar(current_user_id)
+
+@saldo_bp.route('/<int:saldo_id>', methods=['PUT'])
+@token_required
+def atualizar(current_user_id, saldo_id):
+    return SaldoController.atualizar(current_user_id, saldo_id)
+
+@saldo_bp.route('/<int:saldo_id>', methods=['DELETE'])
+@token_required
+def deletar(current_user_id, saldo_id):
+    return SaldoController.deletar(current_user_id, saldo_id)
 
 @saldo_bp.route('/grupo/<int:grupo_id>', methods=['GET'])
 @token_required

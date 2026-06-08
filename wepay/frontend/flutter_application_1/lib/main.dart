@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/services/api_services.dart';
 import 'package:flutter_application_1/views/auth/login_views.dart';
 import 'package:flutter_application_1/views/auth/cadastro_views.dart';
 import 'package:flutter_application_1/views/auth/recuperar_senha_view.dart';
+import 'package:flutter_application_1/views/auth/perfil_view.dart';
 import 'package:flutter_application_1/views/home/dashboard_views.dart';
 import 'package:flutter_application_1/views/grupos/grupo_form_view.dart';
 import 'package:flutter_application_1/views/grupos/grupo_lista_view.dart';
@@ -9,8 +11,11 @@ import 'package:flutter_application_1/views/despesas/despesa_lista_view.dart';
 import 'package:flutter_application_1/views/despesas/despesa_form_view.dart';
 import 'package:flutter_application_1/views/participantes/participante_lista_view.dart';
 import 'package:flutter_application_1/views/saldos/saldo_lista_view.dart';
+import 'package:flutter_application_1/views/saldos/saldo_form_view.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await ApiService.init();
   runApp(const WePayApp());
 }
 
@@ -34,12 +39,14 @@ class WePayApp extends StatelessWidget {
         '/cadastro': (context) => CadastroView(),
         '/recuperar': (context) => RecuperarSenhaView(),
         '/dashboard': (context) => DashboardView(),
+        '/perfil': (context) => PerfilView(),
         '/grupos': (context) => GrupoListaView(),
         '/grupo-form': (context) => GrupoFormView(),
         '/despesas': (context) => DespesaListaView(),
         '/despesa-form': (context) => DespesaFormView(),
         '/participantes': (context) => ParticipanteListaView(),
         '/saldos': (context) => SaldoListaView(),
+        '/saldo-form': (context) => SaldoFormView(),
       },
     );
   }

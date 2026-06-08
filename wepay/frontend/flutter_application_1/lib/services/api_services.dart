@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
   static String get baseUrl {
@@ -11,6 +12,15 @@ class ApiService {
   }
 
   static String? authToken;
+
+  static Future<void> init() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      authToken = prefs.getString('authToken');
+    } catch (e) {
+      authToken = null;
+    }
+  }
 
   static Map<String, String> _headers() {
     final headers = {'Content-Type': 'application/json'};
@@ -37,7 +47,13 @@ class ApiService {
   // --- AUTENTICAÇÃO ---
   static Future<Map<String, dynamic>> login(String email, String senha) async {
     final data = await _post('/auth/login', {'email': email, 'senha': senha});
-    if (data['status'] == 'sucesso') authToken = data['data']?['token'];
+    if (data['status'] == 'sucesso') {
+      authToken = data['data']?['token'];
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        if (authToken != null) await prefs.setString('authToken', authToken!);
+      } catch (e) {}
+    }
     return data;
   }
 
@@ -57,7 +73,13 @@ class ApiService {
     return _post('/usuarios/recuperar-senha', {'email': email});
   }
 
-  static void logout() => authToken = null;
+  static Future<void> logout() async {
+    authToken = null;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('authToken');
+    } catch (e) {}
+  }
 
   // --- DASHBOARD ---
   static Future<Map<String, dynamic>> getDashboard() async {
@@ -93,7 +115,7 @@ class ApiService {
     }
   }
 
-  static Future<bool> salvarGrupo(
+  static Future<Map<String, dynamic>> salvarGrupo(
     String nome, {
     String? descricao,
     int? id,
@@ -101,7 +123,7 @@ class ApiService {
     try {
       final url = id == null ? '$baseUrl/grupos' : '$baseUrl/grupos/$id';
       final body = <String, dynamic>{'nome': nome};
-      if (descricao != null) {
+      if (descricao != null && descricao.isNotEmpty) {
         body['descricao'] = descricao;
       }
       final response = await (id == null
@@ -115,9 +137,25 @@ class ApiService {
               headers: _headers(),
               body: jsonEncode(body),
             ));
-      return response.statusCode == 200 || response.statusCode == 201;
+
+      final decoded = response.body.isNotEmpty
+          ? jsonDecode(response.body) as Map<String, dynamic>
+          : <String, dynamic>{};
+
+      return {
+        'ok': response.statusCode == 200 || response.statusCode == 201,
+        'statusCode': response.statusCode,
+        'status': decoded['status'],
+        'mensagem':
+            decoded['mensagem'] ?? decoded['message'] ?? 'Erro desconhecido',
+      };
     } catch (e) {
-      return false;
+      return {
+        'ok': false,
+        'statusCode': 0,
+        'status': 'erro',
+        'mensagem': 'Falha na conexão com o servidor',
+      };
     }
   }
 
@@ -251,6 +289,109 @@ class ApiService {
     try {
       final response = await http.delete(
         Uri.parse('$baseUrl/participantes/$id'),
+        headers: _headers(),
+      );
+      return response.statusCode == 200;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  static Future<Map<String, dynamic>> getProfile() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/auth/me'),
+        headers: _headers(),
+      );
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+        return decoded['data'] as Map<String, dynamic>? ?? {};
+      }
+      return {};
+    } catch (e) {
+      return {};
+    }
+  }
+
+  static Future<bool> atualizarPerfil(
+    String nome,
+    String email, {
+    String? senha,
+  }) async {
+    try {
+      final body = {'nome': nome, 'email': email};
+      if (senha != null && senha.isNotEmpty) {
+        body['senha'] = senha;
+      }
+      final response = await http.put(
+        Uri.parse('$baseUrl/auth/atualizar'),
+        headers: _headers(),
+        body: jsonEncode(body),
+      );
+      return response.statusCode == 200;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  static Future<bool> deletarConta() async {
+    try {
+      final response = await http.delete(
+        Uri.parse('$baseUrl/auth/delete'),
+        headers: _headers(),
+      );
+      if (response.statusCode == 200) {
+        authToken = null;
+        try {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.remove('authToken');
+        } catch (e) {}
+        return true;
+      }
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  static Future<bool> criarSaldo(Map<String, dynamic> dados) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/saldos'),
+        headers: _headers(),
+        body: jsonEncode(dados),
+      );
+      return response.statusCode == 200 || response.statusCode == 201;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  static Future<bool> atualizarSaldo(
+    int id,
+    double saldo, {
+    int? usuarioId,
+  }) async {
+    try {
+      final Map<String, dynamic> body = {'saldo': saldo};
+      if (usuarioId != null) {
+        body['usuario_id'] = usuarioId;
+      }
+      final response = await http.put(
+        Uri.parse('$baseUrl/saldos/$id'),
+        headers: _headers(),
+        body: jsonEncode(body),
+      );
+      return response.statusCode == 200;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  static Future<bool> deletarSaldo(int id) async {
+    try {
+      final response = await http.delete(
+        Uri.parse('$baseUrl/saldos/$id'),
         headers: _headers(),
       );
       return response.statusCode == 200;

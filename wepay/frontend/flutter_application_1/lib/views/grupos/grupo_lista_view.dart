@@ -160,7 +160,7 @@ class _GrupoListaViewState extends State<GrupoListaView> {
                               children: [
                                 if ((grupo['descricao'] ?? '')
                                     .toString()
-                                    .isNotEmpty)
+                                    .isNotEmpty) ...[
                                   Padding(
                                     padding: const EdgeInsets.only(bottom: 6),
                                     child: Text(
@@ -171,6 +171,8 @@ class _GrupoListaViewState extends State<GrupoListaView> {
                                       ),
                                     ),
                                   ),
+                                ],
+                                const SizedBox(height: 6),
                                 Row(
                                   children: [
                                     Icon(
@@ -256,11 +258,14 @@ class _GrupoListaViewState extends State<GrupoListaView> {
                                         'Saldos',
                                         style: TextStyle(color: Colors.orange),
                                       ),
-                                      onPressed: () => Navigator.pushNamed(
-                                        context,
-                                        '/saldos',
-                                        arguments: grupo,
-                                      ),
+                                      onPressed: () async {
+                                        await Navigator.pushNamed(
+                                          context,
+                                          '/saldos',
+                                          arguments: grupo,
+                                        );
+                                        _carregarGrupos();
+                                      },
                                     ),
                                     TextButton.icon(
                                       icon: const Icon(

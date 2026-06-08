@@ -47,5 +47,7 @@ class GrupoController:
         grupo = GrupoModel.buscar_por_id(grupo_id)
         if not grupo:
             return ResponseUtils.erro("Grupo nao encontrado.", status=404)
+        if grupo['criado_por'] != current_user_id:
+            return ResponseUtils.erro("Apenas o criador do grupo pode removê-lo.", status=403)
         GrupoModel.deletar(grupo_id)
         return ResponseUtils.sucesso(mensagem="Grupo removido.")

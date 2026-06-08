@@ -192,6 +192,12 @@ class _DashboardViewState extends State<DashboardView> {
           elevation: 0,
           actions: [
             IconButton(
+              icon: const Icon(Icons.person, color: Colors.white),
+              onPressed: () {
+                Navigator.pushNamed(context, '/perfil');
+              },
+            ),
+            IconButton(
               icon: const Icon(Icons.refresh, color: Colors.white),
               onPressed: () {
                 setState(() => _carregando = true);

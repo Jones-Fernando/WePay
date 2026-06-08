@@ -20,6 +20,9 @@ class ParticipanteController:
         if not grupo:
             return ResponseUtils.erro("Grupo nao encontrado.", status=404)
 
+        if not ParticipanteModel.buscar(grupo_id, current_user_id):
+            return ResponseUtils.erro("Voce nao participa deste grupo.", status=403)
+
         usuario = UsuarioModel.buscar_por_id(usuario_id)
         if not usuario:
             return ResponseUtils.erro("Usuario nao encontrado.", status=404)
@@ -37,6 +40,8 @@ class ParticipanteController:
         grupo = GrupoModel.buscar_por_id(grupo_id)
         if not grupo:
             return ResponseUtils.erro("Grupo nao encontrado.", status=404)
+        if not ParticipanteModel.buscar(grupo_id, current_user_id):
+            return ResponseUtils.erro("Voce nao participa deste grupo.", status=403)
         lista = ParticipanteModel.listar_por_grupo(grupo_id)
         return ResponseUtils.sucesso(dados=lista)
 
@@ -45,5 +50,9 @@ class ParticipanteController:
         participante = ParticipanteModel.buscar_por_id(participante_id)
         if not participante:
             return ResponseUtils.erro("Participante nao encontrado.", status=404)
+
+        if not ParticipanteModel.buscar(participante['grupo_id'], current_user_id):
+            return ResponseUtils.erro("Voce nao participa deste grupo.", status=403)
+
         ParticipanteModel.remover_por_id(participante_id)
         return ResponseUtils.sucesso(mensagem="Participante removido.")

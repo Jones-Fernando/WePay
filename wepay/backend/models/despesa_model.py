@@ -50,12 +50,16 @@ class DespesaModel:
                 cursor.close()
 
     @staticmethod
-    def atualizar(despesa_id, descricao, valor):
+    def atualizar(despesa_id, descricao, valor, pagador_id=None):
         with get_connection_context() as conn:
             cursor = conn.cursor()
             try:
-                query = "UPDATE despesas SET descricao = %s, valor = %s WHERE id = %s"
-                cursor.execute(query, (descricao, valor, despesa_id))
+                if pagador_id is None:
+                    query = "UPDATE despesas SET descricao = %s, valor = %s WHERE id = %s"
+                    cursor.execute(query, (descricao, valor, despesa_id))
+                else:
+                    query = "UPDATE despesas SET descricao = %s, valor = %s, pagador_id = %s WHERE id = %s"
+                    cursor.execute(query, (descricao, valor, pagador_id, despesa_id))
                 conn.commit()
             finally:
                 cursor.close()

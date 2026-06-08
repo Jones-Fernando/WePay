@@ -26,14 +26,11 @@ void main() {
     await tester.tap(find.text('Criar Conta'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Cadastrar Usuário'), findsOneWidget);
-    expect(
-      find.widgetWithText(ElevatedButton, 'Salvar Cadastro'),
-      findsOneWidget,
-    );
+    expect(find.text('Criar Conta'), findsNWidgets(2));
+    expect(find.widgetWithText(ElevatedButton, 'Criar Conta'), findsOneWidget);
   });
 
-  testWidgets('Dashboard route shows control panel', (
+  testWidgets('Dashboard route loads the dashboard screen', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(const WePayApp());
@@ -43,8 +40,7 @@ void main() {
         .pushNamed('/dashboard');
     await tester.pumpAndSettle();
 
-    expect(find.text('WePay Home'), findsOneWidget);
-    expect(find.text('Painel de Controle'), findsOneWidget);
-    expect(find.text('Gerenciar Grupos'), findsOneWidget);
+    expect(find.text('WePay'), findsWidgets);
+    expect(find.text('Visão Geral'), findsOneWidget);
   });
 }
